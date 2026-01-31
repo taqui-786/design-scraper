@@ -1,36 +1,169 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Design System Scraper
 
-## Getting Started
+> **Shazam for Design Systems** - Extract visual identity from any website
 
-First, run the development server:
+An intelligent web scraper that analyzes websites and extracts their complete design system including colors, typography, logos, and brand vibe.
+
+Built for the Design Intelligence Engine challenge.
+
+## Features
+
+✅ **Smart Color Extraction** - Identifies primary, secondary, and background colors with semantic understanding  
+✅ **Typography Analysis** - Detects heading and body fonts with their properties  
+✅ **Logo Detection** - Finds and extracts logos (SVG prioritized)  
+✅ **AI Vibe Analysis** - Uses Groq LLM to analyze brand tone, audience, and design vibe  
+✅ **Beautiful Dashboard** - Modern dark UI with tabs, color visualizations, and JSON export
+
+## Tech Stack
+
+- **Next.js 16** - React framework
+- **Puppeteer** - Headless browser for JS-rendered sites
+- **Vercel AI SDK** - AI integration
+- **Groq** - Fast LLM inference (llama-3.3-70b-versatile)
+- **shadcn/ui** - Component library
+- **Tailwind CSS v4** - Styling
+
+## Setup
+
+### 1. Install Dependencies
 
 ```bash
-npm run dev
+bun install
 # or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Set Environment Variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create a `.env` file:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+cp .env.example .env
+```
 
-## Learn More
+Edit `.env` and add your Groq API key:
 
-To learn more about Next.js, take a look at the following resources:
+```env
+GROQ_API_KEY=your_groq_api_key_here
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Get your free API key from [console.groq.com/keys](https://console.groq.com/keys)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 3. Run Development Server
 
-## Deploy on Vercel
+```bash
+bun dev
+# or
+npm run dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Open [http://localhost:3000](http://localhost:3000)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Usage
+
+1. Enter a website URL (e.g., `https://adopt.ai`)
+2. Click **Analyze**
+3. Wait 10-30 seconds for scraping
+4. View extracted design system:
+   - **Overview Tab**: Primary color, logo, typography, AI vibe analysis
+   - **Colors Tab**: Full color palette with usage
+   - **Typography Tab**: Font details
+   - **JSON Tab**: Raw API response
+
+## API Endpoint
+
+### POST `/api/scrape`
+
+Extract design system from a URL.
+
+**Request:**
+```json
+{
+  "url": "https://adopt.ai"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "colors": {
+      "primary": "#6366f1",
+      "secondary": "#ec4899",
+      "background": "#0f172a",
+      "all": [...]
+    },
+    "typography": {
+      "headingFont": "Inter",
+      "bodyFont": "Inter",
+      "fonts": [...]
+    },
+    "logo": {
+      "url": "...",
+      "type": "svg"
+    },
+    "vibe": {
+      "tone": "Professional",
+      "audience": "Developers",
+      "vibe": "Tech-forward"
+    },
+    "meta": {
+      "url": "https://adopt.ai",
+      "duration": 15432
+    }
+  }
+}
+```
+
+## Project Structure
+
+```
+my-app/
+├── app/
+│   ├── api/scrape/route.ts   # API endpoint
+│   └── page.tsx              # Dashboard UI
+├── lib/scraper/
+│   ├── index.ts              # Main orchestrator
+│   ├── colors.ts             # Color extraction
+│   ├── typography.ts         # Font extraction
+│   ├── logo.ts               # Logo detection
+│   ├── vibe.ts               # AI analysis
+│   └── types.ts              # TypeScript types
+└── components/ui/            # shadcn components
+```
+
+## How It Works
+
+### 1. Color Classification
+
+The scraper doesn't just dump all hex codes. It analyzes **element roles**:
+
+- **Primary**: Colors from `<button>`, CTAs, `.btn` classes
+- **Secondary**: Links, accent elements
+- **Background**: `<body>`, sections, containers
+
+This ensures you get the *real* brand color, not random border colors.
+
+### 2. Smart Logo Detection
+
+Priority order:
+1. SVG/IMG with "logo" in class/id/alt
+2. First SVG in header/nav
+3. First IMG in header/nav
+
+### 3. AI Vibe Analysis
+
+Extracts H1/hero text → Sends to Groq LLM → Returns structured brand analysis
+
+## Mandatory Test Case
+
+✅ Works on **https://adopt.ai** (verified primary color extraction)
+
+## License
+
+MIT
+
+---
+
+*Built by [Your Name] for the Design Intelligence Engine challenge*
