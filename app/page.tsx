@@ -28,7 +28,7 @@ export default function Home() {
 
             <div className="flex items-center gap-1">
               <a
-                href="https://github.com/your-repo"
+                href="https://github.com/taqui-786/design-scraper"
                 target="_blank"
                 rel="noreferrer"
                 className="p-2 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
