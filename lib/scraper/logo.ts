@@ -1,7 +1,7 @@
 import type { LogoInfo } from "./types";
 
 export async function extractLogoFromPage(
-  page: import("puppeteer").Page,
+  page: import("playwright-core").Page,
   baseUrl: string
 ): Promise<LogoInfo | null> {
   const logoData = await page.evaluate(() => {

@@ -1,7 +1,7 @@
 import type { FontInfo } from "./types";
 
 export async function extractTypographyFromPage(
-  page: import("puppeteer").Page
+  page: import("playwright-core").Page
 ): Promise<FontInfo[]> {
   const fonts = await page.evaluate(() => {
     const fontMap = new Map<

@@ -1,4 +1,5 @@
-import puppeteer from "puppeteer";
+import chromium from "@sparticuz/chromium";
+import { chromium as playwright } from "playwright-core";
 import type { DesignSystemResult } from "./types";
 import { extractColorsFromPage, classifyColors } from "./colors";
 import { extractTypographyFromPage, classifyTypography } from "./typography";
@@ -21,33 +22,42 @@ export async function scrapeDesignSystem(
 
   let browser;
   try {
-    browser = await puppeteer.launch({
-      headless: true,
-      args: [
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--disable-dev-shm-usage",
-        "--disable-gpu",
-        "--disable-web-security",
-        "--disable-features=IsolateOrigins,site-per-process",
-      ],
+    const isProduction = process.env.NODE_ENV === "production";
+
+    if (isProduction) {
+      browser = await playwright.launch({
+        args: chromium.args,
+        executablePath: await chromium.executablePath(),
+        headless: true,
+      });
+    } else {
+      browser = await playwright.launch({
+        headless: true,
+        args: [
+          "--no-sandbox",
+          "--disable-setuid-sandbox",
+          "--disable-dev-shm-usage",
+          "--disable-gpu",
+          "--disable-web-security",
+          "--disable-features=IsolateOrigins,site-per-process",
+        ],
+      });
+    }
+
+    const context = await browser.newContext({
+      viewport: { width: 1920, height: 1080 },
+      userAgent:
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
     });
 
-    const page = await browser.newPage();
+    const page = await context.newPage();
 
-    await page.setViewport({ width: 1920, height: 1080 });
-
-    await page.setUserAgent(
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
-    );
-    await page.setRequestInterception(true);
-    page.on("request", (request) => {
-      const resourceType = request.resourceType();
-
+    await page.route("**/*", (route) => {
+      const resourceType = route.request().resourceType();
       if (["media", "font", "websocket"].includes(resourceType)) {
-        request.abort();
+        route.abort();
       } else {
-        request.continue();
+        route.continue();
       }
     });
 
@@ -59,7 +69,7 @@ export async function scrapeDesignSystem(
     } catch (navError: unknown) {
       const content = await page.content();
       if (content.length < 1000) {
-        throw navError; // Page didn't load at all
+        throw navError;
       }
       console.warn(
         "[Scraper] Navigation timeout but page has content, continuing..."
@@ -67,12 +77,10 @@ export async function scrapeDesignSystem(
     }
 
     try {
-      await page.waitForNetworkIdle({ timeout: 5000 });
+      await page.waitForLoadState("networkidle", { timeout: 5000 });
     } catch {}
 
-    await page.evaluate(
-      () => new Promise((resolve) => setTimeout(resolve, 1500))
-    );
+    await page.waitForTimeout(1500);
 
     const title = await page.title();
 

@@ -61,7 +61,7 @@ export function InputForm({
               className={`h-full rounded-full font-semibold shadow-sm transition-all duration-300 ${
                 loading
                   ? "w-32 bg-primary/10 text-primary hover:bg-primary/20"
-                  : "w-24 bg-[#333]  text-white hover:bg-primary/90 hover:scale-105 active:scale-95"
+                  : "w-24 bg-[#333]  text-white hover:bg-[#222] hover:scale-105 active:scale-95"
               }`}
             >
               {loading ? (

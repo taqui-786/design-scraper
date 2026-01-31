@@ -1,7 +1,7 @@
 import type { ColorInfo } from "./types";
 
 export async function extractColorsFromPage(
-  page: import("puppeteer").Page
+  page: import("playwright-core").Page
 ): Promise<ColorInfo[]> {
   const colors = await page.evaluate(() => {
     const colorMap = new Map<

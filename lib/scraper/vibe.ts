@@ -7,7 +7,7 @@ const groq = createGroq({
 });
 
 export async function extractHeroTextFromPage(
-  page: import("puppeteer").Page
+  page: import("playwright-core").Page
 ): Promise<string | null> {
   const heroText = await page.evaluate(() => {
     const selectors = [
