@@ -1,4 +1,4 @@
-import chromium from "@sparticuz/chromium";
+import chromium from "@sparticuz/chromium-min";
 import { chromium as playwright } from "playwright-core";
 import type { DesignSystemResult } from "./types";
 import { extractColorsFromPage, classifyColors } from "./colors";
@@ -13,6 +13,9 @@ export interface ScraperOptions {
   waitForNetworkIdle?: boolean;
 }
 
+const CHROMIUM_EXECUTABLE_URL =
+  "https://github.com/AhmedAdelFahim/puppeteer-chromium-lambda/releases/download/v143.0.0/chromium-v143.0.0-pack.tar";
+
 export async function scrapeDesignSystem(
   url: string,
   options: ScraperOptions = {}
@@ -25,9 +28,12 @@ export async function scrapeDesignSystem(
     const isProduction = process.env.NODE_ENV === "production";
 
     if (isProduction) {
+      const executablePath = await chromium.executablePath(
+        CHROMIUM_EXECUTABLE_URL
+      );
       browser = await playwright.launch({
         args: chromium.args,
-        executablePath: await chromium.executablePath(),
+        executablePath,
         headless: true,
       });
     } else {

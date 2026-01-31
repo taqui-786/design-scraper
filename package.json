@@ -13,7 +13,7 @@
     "@base-ui/react": "^1.1.0",
     "@hugeicons/core-free-icons": "^3.1.1",
     "@hugeicons/react": "^1.1.4",
-    "@sparticuz/chromium": "^143.0.4",
+    "@sparticuz/chromium-min": "^143.0.4",
     "@types/react-syntax-highlighter": "^15.5.13",
     "ai": "^6.0.64",
     "class-variance-authority": "^0.7.1",
