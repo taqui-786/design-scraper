@@ -14,7 +14,7 @@ export interface ScraperOptions {
 }
 
 const CHROMIUM_EXECUTABLE_URL =
-  "https://github.com/AhmedAdelFahim/puppeteer-chromium-lambda/releases/download/v143.0.0/chromium-v143.0.0-pack.tar";
+  "https://github.com/Sparticuz/chromium/releases/download/v143.0.4/chromium-v143.0.4-pack.x64.tar";
 
 export async function scrapeDesignSystem(
   url: string,
@@ -25,9 +25,9 @@ export async function scrapeDesignSystem(
 
   let browser;
   try {
-    const isProduction = process.env.NODE_ENV === "production";
+    const isVercel = !!process.env.VERCEL;
 
-    if (isProduction) {
+    if (isVercel) {
       const executablePath = await chromium.executablePath(
         CHROMIUM_EXECUTABLE_URL
       );
